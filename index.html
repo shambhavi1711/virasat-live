@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Virasat Live | Experience Heritage</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfr+Display:ital,wght@0,500;0,600;1,500&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+
+        <div class="logo">
+            ✦ Virasat <span>Live</span>
+        </div>
+
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#explore">Explore</a>
+            <a href="#how">How It Works</a>
+            <a href="#ai">AI Guide</a>
+            <a href="#community">Community</a>
+        </nav>
+
+        <button class="nav-button" onclick="startJourney()">
+            Start Exploring →
+        </button>
+
+    </header>
+
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="home">
+
+        <div class="hero-content">
+
+            <div class="tagline">
+                ✦ AI × HERITAGE × ADVENTURE
+            </div>
+
+            <h1>
+                History isn't
+                <em>read.</em>
+                It's
+                <span>experienced.</span>
+            </h1>
+
+            <p>
+                Turn your next heritage visit into a living story.
+                Scan, listen, ask, solve and unlock the culture
+                around you with Virasat Live.
+            </p>
+
+            <div class="buttons">
+
+                <button class="primary" onclick="startJourney()">
+                    Begin Your Journey ↗
+                </button>
+
+                <button class="secondary" onclick="scrollToSection('how')">
+                    See How It Works
+                </button>
+
+            </div>
+
+            <div class="small-text">
+                🧑🏽 👩🏻 🧑🏾
+                <span>
+                    Made for curious explorers
+                    <small>Discover stories hiding in plain sight.</small>
+                </span>
+            </div>
+
+        </div>
+
+
+        <!-- HERO VISUAL -->
+        <div class="hero-card">
+
+            <div class="monument">
+
+    <img
+        src="agrafort.jpg"
+        alt="Agra Fort"
+    >
+
+</div>
+
+            <div class="checkpoint">
+
+                <div class="checkpoint-top">
+                    <span>● LIVE</span>
+                    <small>CHECKPOINT 01 / 05</small>
+                </div>
+
+                <h2>Amar Singh Gate</h2>
+
+                <p>
+                    "I have watched centuries pass through my gates..."
+                </p>
+
+                <div class="checkpoint-buttons">
+
+                    <button onclick="showStory()">
+                        ▶ Hear My Story
+                    </button>
+
+                    <button onclick="showQR()">
+                        ⌗
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- STATS -->
+    <section class="stats">
+
+        <div>
+            <strong>01</strong>
+            <span>Pilot Heritage Site</span>
+        </div>
+
+        <div>
+            <strong>05</strong>
+            <span>Interactive Checkpoints</span>
+        </div>
+
+        <div>
+            <strong>10+</strong>
+            <span>Heritage Quests</span>
+        </div>
+
+        <div>
+            <strong>∞</strong>
+            <span>Stories Waiting</span>
+        </div>
+
+    </section>
+
+
+    <!-- EXPLORE -->
+    <section class="section" id="explore">
+
+        <div class="section-heading">
+
+            <div>
+
+                <label>EXPLORE</label>
+
+                <h2>
+                    Choose a story.
+                    <br>
+                    <em>Start an adventure.</em>
+                </h2>
+
+            </div>
+
+            <p>
+                Virasat Live transforms heritage sites into
+                interactive experiences filled with stories,
+                AI conversations and real-world challenges.
+            </p>
+
+        </div>
+
+
+        <div class="cards">
+
+            <!-- AGRA FORT -->
+
+            <div class="card">
+
+                <div class="image agra">
+
+                    <span>📍 Agra, Uttar Pradesh</span>
+
+                    <h3>
+                        AGRA
+                        <br>
+                        FORT
+                    </h3>
+
+                </div>
+
+                <div class="card-content">
+
+                    <label>PILOT EXPERIENCE</label>
+
+                    <h2>Agra Fort</h2>
+
+                    <p>
+                        Walk through Mughal history one
+                        checkpoint at a time.
+                    </p>
+
+                    <button onclick="startJourney()">
+                        Explore Journey →
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ADALAJ -->
+
+            <div class="card">
+
+                <div class="image stepwell">
+
+                    <span>📍 Gujarat</span>
+
+                    <h3>
+                        ADALAJ
+                        <br>
+                        STEPWELL
+                    </h3>
+
+                </div>
+
+                <div class="card-content">
+
+                    <label>COMING SOON</label>
+
+                    <h2>Adalaj Stepwell</h2>
+
+                    <p>
+                        Architecture, water and stories
+                        carved into stone.
+                    </p>
+
+                    <button onclick="comingSoon()">
+                        Notify Me →
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- FOLK STORIES -->
+
+            <div class="card">
+
+                <div class="image folk">
+
+                    <span>✦ Living Heritage</span>
+
+                    <h3>
+                        FOLK
+                        <br>
+                        STORIES
+                    </h3>
+
+                </div>
+
+                <div class="card-content">
+
+                    <label>COMMUNITY</label>
+
+                    <h2>Living Culture</h2>
+
+                    <p>
+                        Folk arts, crafts, festivals and
+                        local legends.
+                    </p>
+
+                    <button onclick="community()">
+                        Discover More →
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+
+    <section class="how" id="how">
+
+        <div class="center">
+
+            <label>THE VIRASAT LOOP</label>
+
+            <h2>
+                Six steps.
+                <em>One unforgettable visit.</em>
+            </h2>
+
+            <p>
+                No long lectures. No endless Googling.
+                Just explore.
+            </p>
+
+        </div>
+
+
+        <div class="steps">
+
+            <div>
+                <small>01</small>
+                <b>⌗</b>
+                <h3>Scan</h3>
+                <p>Scan a QR at a Heritage Checkpoint.</p>
+            </div>
+
+            <div>
+                <small>02</small>
+                <b>◉</b>
+                <h3>Hear</h3>
+                <p>The place tells its story in first person.</p>
+            </div>
+
+            <div>
+                <small>03</small>
+                <b>✦</b>
+                <h3>Ask</h3>
+                <p>Ask the AI guide anything.</p>
+            </div>
+
+            <div>
+                <small>04</small>
+                <b>?</b>
+                <h3>Play</h3>
+                <p>Solve a real-world heritage quest.</p>
+            </div>
+
+            <div>
+                <small>05</small>
+                <b>★</b>
+                <h3>Earn</h3>
+                <p>Collect points and badges.</p>
+            </div>
+
+            <div>
+                <small>06</small>
+                <b>↗</b>
+                <h3>Unlock</h3>
+                <p>Discover the next story.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- AI GUIDE -->
+
+    <section class="ai-section" id="ai">
+
+        <div class="ai-text">
+
+            <label>YOUR AI HERITAGE GUIDE</label>
+
+            <h2>
+                Ask the monument
+                <br>
+                <em>anything.</em>
+            </h2>
+
+            <p>
+                Curious about an arch, carving or forgotten story?
+                Ask in your own words. Virasat Live gives visitors
+                a conversational way to understand what they are seeing.
+            </p>
+
+            <ul>
+                <li>✓ Source-grounded answers</li>
+                <li>✓ Simple explanations</li>
+                <li>✓ Multilingual experience</li>
+            </ul>
+
+        </div>
+
+
+        <!-- CHAT -->
+
+        <div class="chat">
+
+            <div class="chat-header">
+
+                <div class="ai-icon">
+                    ✦
+                </div>
+
+                <div>
+                    <strong>Virasat Guide</strong>
+                    <small>● Online at this checkpoint</small>
+                </div>
+
+            </div>
+
+
+            <div class="messages">
+
+                <div class="bot-message">
+                    Welcome, explorer. You're standing at
+                    Amar Singh Gate. What would you like to uncover?
+                </div>
+
+                <div class="user-message">
+                    Why is the entrance designed this way?
+                </div>
+
+                <div class="bot-message">
+
+                    The angled approach made the entrance
+                    easier to defend and slowed direct movement
+                    into the fort.
+
+                </div>
+
+
+                <div class="quest">
+
+                    🎯
+
+                    <div>
+                        <strong>Quest Unlocked</strong>
+
+                        <small>
+                            Find the feature that made this entrance
+                            harder to attack.
+                        </small>
+                    </div>
+
+                    <button onclick="startQuest()">
+                        Play →
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="chat-input" onclick="showAIDemo()">
+    Ask about this place...
+    <span>↗</span>
+</div>
+        </div>
+
+    </section>
+
+
+    <!-- COMMUNITY -->
+
+    <section class="section" id="community">
+
+        <div class="community">
+
+            <div>
+
+                <label>LIVING HERITAGE</label>
+
+                <h2>
+                    Know a story
+                    <br>
+                    the internet
+                    <em>forgot?</em>
+                </h2>
+
+                <p>
+                    Virasat Live isn't only about famous monuments.
+                    Communities can help document stepwells,
+                    local legends, crafts, folk traditions and
+                    forgotten places.
+                </p>
+
+                <button class="primary" onclick="community()">
+                    Contribute a Story ↗
+                </button>
+
+            </div>
+
+
+            <div class="circle">
+
+                <div class="circle-center">
+                    ✦
+
+                    <small>
+                        Virasat
+                        <br>
+                        Live
+                    </small>
+
+                </div>
+
+                <span class="item item1">🏛️</span>
+                <span class="item item2">🎭</span>
+                <span class="item item3">🧵</span>
+                <span class="item item4">🎶</span>
+                <span class="item item5">🪔</span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FINAL CTA -->
+
+    <section class="final">
+
+        <label>
+            YOUR NEXT ADVENTURE IS WAITING
+        </label>
+
+        <h2>
+            Don't just visit.
+            <br>
+            <em>Experience the Virasat.</em>
+        </h2>
+
+        <button class="primary" onclick="startJourney()">
+            Start Exploring →
+        </button>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="logo">
+            ✦ Virasat <span>Live</span>
+        </div>
+
+        <p>
+            AI × Heritage × Community
+        </p>
+
+        <p>
+            SIH 2026 Concept Prototype
+        </p>
+
+    </footer>
+
+
+    <!-- POPUP -->
+
+    <div class="modal" id="modal">
+
+        <div class="modal-box">
+
+            <button class="close" onclick="closeModal()">
+                ×
+            </button>
+
+            <div id="modal-content"></div>
+
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
