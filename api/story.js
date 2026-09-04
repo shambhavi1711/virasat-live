@@ -6,31 +6,45 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { place, checkpoint } = req.body;
+    const { siteName, facts, language } = req.body;
 
     const prompt = `
 You are the historical site speaking in first person.
 
-Heritage site: ${place}
-Checkpoint: ${checkpoint}
+Heritage Site: ${siteName}
 
-Tell a short, immersive and historically respectful story.
-Speak as if you are the heritage site itself.
-Keep it around 100-150 words.
-Do not invent specific historical facts.
+Verified heritage information provided for this checkpoint:
+${facts}
+
+Language: ${language}
+
+Create a short, immersive and historically respectful "History Speaks" story.
+
+Speak in first person as if the heritage site itself is talking to the visitor.
+
+Use ONLY the heritage information provided above.
+Do not invent historical facts, dates, people, events, or architectural details.
+
+Keep the story around 100-150 words.
+Make it engaging and suitable for a student visiting a heritage site.
 `;
 
-    const response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-5.6-luna",
-        input: prompt
-      })
-    });
+    const response = await fetch(
+      "https://api.openai.com/v1/responses",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+        },
+
+        body: JSON.stringify({
+          model: "gpt-5.6-luna",
+          input: prompt
+        })
+      }
+    );
 
     const data = await response.json();
 
@@ -45,7 +59,7 @@ Do not invent specific historical facts.
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("History Speaks API error:", error);
 
     return res.status(500).json({
       error: "Something went wrong"
