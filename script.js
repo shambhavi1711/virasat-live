@@ -239,6 +239,7 @@ function completeCheckpoint(number) {
         addXP(50);
     }
 
+
     if (
         number < 5 &&
         unlockedCheckpoint < number + 1
@@ -251,6 +252,7 @@ function completeCheckpoint(number) {
             unlockedCheckpoint
         );
     }
+
 
     if (number === 5) {
 
@@ -265,6 +267,7 @@ function completeCheckpoint(number) {
 
 
 function isCompleted(number) {
+
     return completedCheckpoints.includes(number);
 }
 
@@ -289,30 +292,25 @@ function startCheckpoint(number) {
         number = 1;
     }
 
-    showCheckpoint(number);
-}
-
-/* =========================================
-   CHECKPOINT SCREEN
-   ========================================= */
-
-function startCheckpoint(number) {
-
-    if (number < 1 || number > 5) {
-        number = 1;
-    }
-
     showStory(number);
 }
 
+
 /* =========================================
-   STORY
+   AI HISTORY SPEAKS
    ========================================= */
 
-function showStory(number) {
+async function showStory(number = 1) {
 
-    const place =
-        checkpoints[number];
+    const place = checkpoints[number];
+
+    if (!place) {
+        console.error("Checkpoint not found:", number);
+        return;
+    }
+
+
+    /* Show loading screen */
 
     openModal(`
 
@@ -322,48 +320,205 @@ function showStory(number) {
         </label>
 
         <h2>
-            ${place.name}
+            ${escapeHTML(place.name)}
         </h2>
 
         <h3>
-            "${place.storyTitle}"
+            "${escapeHTML(place.storyTitle)}"
         </h3>
 
-        <p>
-            ${place.story}
-        </p>
+        <div class="ai-story-loading">
 
-        <div class="story-note">
-
-            <strong>
-                🎧 Story Mode
-            </strong>
-
-            <p>
-                In the full Virasat Live platform,
-                this story can also be available
-                as multilingual audio narration.
-            </p>
+            ✦ History Speaks is preparing
+            your story...
 
         </div>
 
-        <p class="verification-note">
-
-            ✓ Checkpoint-specific story<br>
-            ✓ Heritage learning experience<br>
-            ✓ Interactive exploration
-
-        </p>
-
-        <button
-            class="modal-button"
-            onclick="startQuest(${number})">
-
-            Start Quest →
-
-        </button>
-
     `);
+
+
+    /* Information sent to secure API */
+
+    const facts = `
+
+Heritage Site: ${place.name}
+
+Provided Heritage Information:
+${place.story}
+
+Quest Question:
+${place.question}
+
+Hint:
+${place.hint}
+
+`;
+
+
+    try {
+
+        const response = await fetch("/api/story", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                siteName: place.name,
+
+                facts: facts,
+
+                language: "English"
+
+            })
+
+        });
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Unable to generate story"
+            );
+        }
+
+
+        const story = data.story;
+
+
+        /* Save story for future audio feature */
+
+        window.currentHistoryStory = story;
+
+
+        /* Display AI story */
+
+        openModal(`
+
+            <label>
+                CHECKPOINT
+                ${String(number).padStart(2, "0")} / 05
+            </label>
+
+            <h2>
+                ${escapeHTML(place.name)}
+            </h2>
+
+            <h3>
+                "${escapeHTML(place.storyTitle)}"
+            </h3>
+
+            <div class="ai-story">
+                ${escapeHTML(story)}
+            </div>
+
+
+            <div class="story-note">
+
+                <strong>
+                    ✦ HISTORY SPEAKS
+                </strong>
+
+                <p>
+                    This story was created from
+                    the heritage information provided
+                    for this checkpoint.
+                </p>
+
+            </div>
+
+
+            <p class="verification-note">
+
+                ✓ Checkpoint-specific story<br>
+                ✓ AI-powered narration<br>
+                ✓ Heritage learning experience
+
+            </p>
+
+
+            <button
+                class="modal-button"
+                onclick="startQuest(${number})">
+
+                Start Quest →
+
+            </button>
+
+        `);
+
+
+    } catch (error) {
+
+        console.error(
+            "History Speaks error:",
+            error
+        );
+
+
+        /* Fallback to original story */
+
+        openModal(`
+
+            <label>
+                CHECKPOINT
+                ${String(number).padStart(2, "0")} / 05
+            </label>
+
+            <h2>
+                ${escapeHTML(place.name)}
+            </h2>
+
+            <h3>
+                "${escapeHTML(place.storyTitle)}"
+            </h3>
+
+            <p>
+                ${escapeHTML(place.story)}
+            </p>
+
+
+            <div class="story-note">
+
+                <strong>
+                    🎧 Story Mode
+                </strong>
+
+                <p>
+                    AI storytelling is temporarily
+                    unavailable. You can still explore
+                    the heritage story.
+                </p>
+
+            </div>
+
+
+            <p class="verification-note">
+
+                ✓ Checkpoint information<br>
+                ✓ Heritage learning experience<br>
+                ✓ Interactive exploration
+
+            </p>
+
+
+            <button
+                class="modal-button"
+                onclick="startQuest(${number})">
+
+                Start Quest →
+
+            </button>
+
+        `);
+    }
 }
 
 
@@ -377,14 +532,17 @@ function showQR(number = 1) {
         "agra-" +
         String(number).padStart(2, "0");
 
+
     const checkpointURL =
         window.location.origin +
         window.location.pathname +
         "?checkpoint=" +
         checkpointID;
 
+
     const place =
         checkpoints[number];
+
 
     openModal(`
 
@@ -397,27 +555,32 @@ function showQR(number = 1) {
         </h2>
 
         <p>
+
             <b>
                 Checkpoint
                 ${String(number).padStart(2, "0")}
             </b>
 
-            — ${place.name}
+            — ${escapeHTML(place.name)}
+
         </p>
 
-       <div class="qr-demo">
 
-    <img
-        src="images/qr-agra-${String(number).padStart(2, "0")}.png"
-        alt="Agra Fort Checkpoint QR Code"
-        class="real-qr"
-    >
+        <div class="qr-demo">
 
-</div>
+            <img
+                src="images/qr-agra-${String(number).padStart(2, "0")}.png"
+                alt="Agra Fort Checkpoint QR Code"
+                class="real-qr"
+            >
+
+        </div>
+
 
         <p class="qr-url">
-            ${checkpointURL}
+            ${escapeHTML(checkpointURL)}
         </p>
+
 
         <button
             class="modal-button"
@@ -440,11 +603,13 @@ function openCheckpoint(number) {
     const url =
         new URL(window.location.href);
 
+
     url.searchParams.set(
         "checkpoint",
         "agra-" +
         String(number).padStart(2, "0")
     );
+
 
     window.history.pushState(
         {},
@@ -452,7 +617,9 @@ function openCheckpoint(number) {
         url
     );
 
+
     closeModal();
+
 
     setTimeout(function () {
 
@@ -471,7 +638,12 @@ function startQuest(number) {
     const place =
         checkpoints[number];
 
+
+    if (!place) return;
+
+
     let optionsHTML = "";
+
 
     place.options.forEach(
         function(option, index) {
@@ -480,15 +652,10 @@ function startQuest(number) {
 
                 <button
                     class="modal-button"
-                    onclick="
-                        answerQuest(
-                            ${number},
-                            ${index}
-                        )
-                    ">
+                    onclick="answerQuest(${number}, ${index})">
 
                     ${String.fromCharCode(65 + index)}.
-                    ${option}
+                    ${escapeHTML(option)}
 
                 </button>
 
@@ -496,29 +663,40 @@ function startQuest(number) {
         }
     );
 
+
     openModal(`
 
         <label>
+
             QUEST
             ${String(number).padStart(2, "0")}
+
         </label>
 
+
         <h2>
+
             🕵️ Heritage Detective
+
         </h2>
 
+
         <p>
+
             <b>
-                ${place.question}
+                ${escapeHTML(place.question)}
             </b>
+
         </p>
 
+
         ${optionsHTML}
+
 
         <p class="demo-note">
 
             💡 Hint:
-            ${place.hint}
+            ${escapeHTML(place.hint)}
 
         </p>
 
@@ -535,12 +713,18 @@ function answerQuest(number, selected) {
     const place =
         checkpoints[number];
 
+
+    if (!place) return;
+
+
     if (selected === place.answer) {
 
         const alreadyCompleted =
             isCompleted(number);
 
+
         completeCheckpoint(number);
+
 
         if (alreadyCompleted) {
 
@@ -554,6 +738,7 @@ function answerQuest(number, selected) {
                     ✓ Correct!
                 </h2>
 
+
                 <div class="xp-box">
 
                     <span>
@@ -565,6 +750,7 @@ function answerQuest(number, selected) {
                     </strong>
 
                 </div>
+
 
                 <button
                     class="modal-button"
@@ -596,6 +782,7 @@ function answerQuest(number, selected) {
                     +50 Virasat XP
                 </h2>
 
+
                 <div class="xp-box">
 
                     <span>
@@ -608,23 +795,28 @@ function answerQuest(number, selected) {
 
                 </div>
 
+
                 <p>
                     Excellent observation!
                 </p>
 
+
                 <p>
+
                     <b>
+
                         🔓 Checkpoint
                         ${number + 1}
                         unlocked.
+
                     </b>
+
                 </p>
+
 
                 <button
                     class="modal-button"
-                    onclick="
-                        startCheckpoint(${number + 1})
-                    ">
+                    onclick="startCheckpoint(${number + 1})">
 
                     Explore Checkpoint
                     ${number + 1} →
@@ -634,6 +826,7 @@ function answerQuest(number, selected) {
             `);
         }
 
+
     } else {
 
         openModal(`
@@ -642,13 +835,16 @@ function answerQuest(number, selected) {
                 NOT QUITE 👀
             </label>
 
+
             <h2>
                 Look Again
             </h2>
 
+
             <p>
-                ${place.hint}
+                ${escapeHTML(place.hint)}
             </p>
+
 
             <button
                 class="modal-button"
@@ -675,9 +871,11 @@ function openFinalBadge() {
             JOURNEY COMPLETE
         </label>
 
+
         <h2>
             🏆 Agra Fort Explorer
         </h2>
+
 
         <div class="xp-box">
 
@@ -691,14 +889,19 @@ function openFinalBadge() {
 
         </div>
 
+
         <p>
             🎉 Congratulations!
         </p>
 
+
         <p>
+
             You completed all five
             Agra Fort heritage checkpoints.
+
         </p>
+
 
         <div class="story-note">
 
@@ -711,6 +914,7 @@ function openFinalBadge() {
             </p>
 
         </div>
+
 
         <button
             class="modal-button"
@@ -728,7 +932,7 @@ function openFinalBadge() {
    AI HERITAGE GUIDE
    ========================================= */
 
-function showAIDemo() {
+function AIDemo() {
 
     openModal(`
 
@@ -736,14 +940,19 @@ function showAIDemo() {
             AI HERITAGE GUIDE
         </label>
 
+
         <h2>
             Ask the Monument Anything.
         </h2>
 
+
         <p>
+
             Ask a question about your
             current heritage experience.
+
         </p>
+
 
         <input
             id="ai-question"
@@ -751,6 +960,7 @@ function showAIDemo() {
             type="text"
             placeholder="Ask about this place..."
         >
+
 
         <button
             class="modal-button"
@@ -760,16 +970,23 @@ function showAIDemo() {
 
         </button>
 
+
         <p class="demo-note">
 
             Demo mode: responses are currently
-            simulated. The production version can
-            use RAG with a verified heritage
-            knowledge base.
+            simulated.
 
         </p>
 
     `);
+}
+
+
+/* Allow HTML to call showAIDemo() */
+
+function showAIDemo() {
+
+    AIDemo();
 }
 
 
@@ -780,10 +997,13 @@ function submitAIQuestion() {
             "ai-question"
         );
 
+
     if (!input) return;
+
 
     const question =
         input.value.trim();
+
 
     if (question === "") {
 
@@ -791,6 +1011,7 @@ function submitAIQuestion() {
 
         return;
     }
+
 
     askAI(question);
 }
@@ -801,8 +1022,10 @@ function askAI(question) {
     const q =
         question.toLowerCase();
 
+
     let response =
         "That's an interesting question. In the full Virasat Live platform, I would retrieve verified information about the exact heritage checkpoint before answering.";
+
 
     if (
         q.includes("agra") ||
@@ -830,15 +1053,18 @@ function askAI(question) {
             "नमस्ते! विरासत लाइव का उद्देश्य विरासत स्थलों की जानकारी को स्थानीय भाषाओं में आसान और इंटरैक्टिव बनाना है।";
     }
 
+
     openModal(`
 
         <label>
             AI HERITAGE GUIDE
         </label>
 
+
         <h2>
             Virasat AI
         </h2>
+
 
         <div class="ai-answer">
 
@@ -850,7 +1076,9 @@ function askAI(question) {
                 ${escapeHTML(question)}
             </p>
 
+
             <hr>
+
 
             <strong>
                 🏛️ Virasat AI:
@@ -862,6 +1090,7 @@ function askAI(question) {
 
         </div>
 
+
         <p class="verification-note">
 
             ✓ Checkpoint-aware concept<br>
@@ -869,6 +1098,7 @@ function askAI(question) {
             ✓ Multilingual experience
 
         </p>
+
 
         <button
             class="modal-button"
@@ -882,12 +1112,18 @@ function askAI(question) {
 }
 
 
+/* =========================================
+   HTML SECURITY HELPER
+   ========================================= */
+
 function escapeHTML(text) {
 
     const div =
         document.createElement("div");
 
+
     div.textContent = text;
+
 
     return div.innerHTML;
 }
@@ -905,19 +1141,25 @@ function community() {
             LIVING HERITAGE
         </label>
 
+
         <h2>
             Share a Story.
         </h2>
 
+
         <p>
+
             Know an old stepwell, local legend,
             craft, folk tradition or forgotten place?
+
         </p>
+
 
         <textarea
             class="community-input"
             placeholder="Tell us about it..."
         ></textarea>
+
 
         <p class="demo-note">
 
@@ -925,6 +1167,7 @@ function community() {
             and verified before publication.
 
         </p>
+
 
         <button
             class="modal-button"
@@ -946,20 +1189,28 @@ function submitStory() {
             THANK YOU 🌿
         </label>
 
+
         <h2>
             Story Received
         </h2>
 
-        <p>
-            Your contribution has been added
-            to the prototype submission flow.
-        </p>
 
         <p>
+
+            Your contribution has been added
+            to the prototype submission flow.
+
+        </p>
+
+
+        <p>
+
             In the full platform, submissions
             would go through verification before
             becoming public.
+
         </p>
+
 
         <button
             class="modal-button"
@@ -981,9 +1232,11 @@ function showProgress() {
 
     let checkpointList = "";
 
+
     for (let i = 1; i <= 5; i++) {
 
         let status = "🔒 Locked";
+
 
         if (isCompleted(i)) {
 
@@ -994,15 +1247,19 @@ function showProgress() {
             status = "🔓 Unlocked";
         }
 
+
         checkpointList += `
 
             <p>
+
                 Checkpoint ${i}:
                 ${status}
+
             </p>
 
         `;
     }
+
 
     openModal(`
 
@@ -1010,9 +1267,11 @@ function showProgress() {
             MY VIRASAT JOURNEY
         </label>
 
+
         <h2>
             Your Progress 🏆
         </h2>
+
 
         <div class="xp-box">
 
@@ -1026,7 +1285,9 @@ function showProgress() {
 
         </div>
 
+
         ${checkpointList}
+
 
         <p>
 
@@ -1039,6 +1300,7 @@ function showProgress() {
             }
 
         </p>
+
 
         <button
             class="modal-button"
@@ -1072,6 +1334,7 @@ function resetDemo() {
         "agraExplorerBadge"
     );
 
+
     xp = 0;
 
     completedCheckpoints = [];
@@ -1080,20 +1343,26 @@ function resetDemo() {
 
     finalBadge = false;
 
+
     openModal(`
 
         <label>
             DEMO RESET
         </label>
 
+
         <h2>
             Journey Restarted 🔄
         </h2>
 
+
         <p>
+
             XP, checkpoints and badge
             have been reset.
+
         </p>
+
 
         <button
             class="modal-button"
@@ -1118,20 +1387,26 @@ function detectCheckpoint() {
             window.location.search
         );
 
+
     const checkpoint =
         params.get("checkpoint");
 
+
     if (!checkpoint) return;
+
 
     const match =
         checkpoint.match(
             /^agra-0([1-5])$/
         );
 
+
     if (!match) return;
+
 
     const number =
         Number(match[1]);
+
 
     setTimeout(function () {
 
