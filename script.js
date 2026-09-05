@@ -320,13 +320,20 @@ async function showStory(number = 1) {
         </label>
 
         <h2>
-            ${escapeHTML(place.name)}
-        </h2>
+    ${escapeHTML(place.name)}
+</h2>
 
-        <h3>
-            "${escapeHTML(place.storyTitle)}"
-        </h3>
+${number === 1 ? `
+    <img
+        src="amarsingh.jpg"
+        alt="Amar Singh Gate"
+        class="story-image"
+    >
+` : ""}
 
+<h3>
+    "${escapeHTML(place.storyTitle)}"
+</h3>
         <div class="ai-story-loading">
 
             ✦ History Speaks is preparing
@@ -473,12 +480,20 @@ ${place.hint}
             </label>
 
             <h2>
-                ${escapeHTML(place.name)}
-            </h2>
+    ${escapeHTML(place.name)}
+</h2>
 
-            <h3>
-                "${escapeHTML(place.storyTitle)}"
-            </h3>
+${number === 1 ? `
+    <img
+        src="amarsingh.jpg"
+        alt="Amar Singh Gate"
+        class="story-image"
+    >
+` : ""}
+
+<h3>
+    "${escapeHTML(place.storyTitle)}"
+</h3>
 
             <p>
                 ${escapeHTML(place.story)}

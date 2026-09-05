@@ -1349,3 +1349,37 @@ footer {
 .language-selector select:focus {
     outline: none;
 }
+/* KONARK SUN TEMPLE */
+.image.konark {
+    background-image: url("konark.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+/* HAMPI */
+.image.hampi {
+    background-image: url("hampi.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+/* SANCHI STUPA */
+.image.sanchi {
+    background-image: url("sanchi.jpg");
+    background-size: cover;
+    background-position: center;
+}
+/* MAHABALIPURAM */
+.image.mahabalipuram {
+    background-image: url("mahabalipuram.jpg");
+    background-size: cover;
+    background-position: center;
+}
+.story-image {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 14px;
+    margin: 15px 0 20px;
+    display: block;
+}
