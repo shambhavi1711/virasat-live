@@ -1428,3 +1428,41 @@ document.addEventListener(
 
     }
 );
+function changeLanguage(language) {
+
+    const translations = {
+        en: {
+            home: "Home",
+            explore: "Explore",
+            how: "How It Works",
+            ai: "AI Guide",
+            community: "Community"
+        },
+
+        hi: {
+            home: "होम",
+            explore: "खोजें",
+            how: "यह कैसे काम करता है",
+            ai: "AI गाइड",
+            community: "समुदाय"
+        },
+
+        hinglish: {
+            home: "Home",
+            explore: "Explore Karo",
+            how: "Kaise Kaam Karta Hai",
+            ai: "AI Guide",
+            community: "Community"
+        }
+    };
+
+    const selectedLanguage = translations[language];
+
+    document.querySelectorAll("[data-i18n]").forEach(element => {
+        const key = element.getAttribute("data-i18n");
+
+        if (selectedLanguage[key]) {
+            element.textContent = selectedLanguage[key];
+        }
+    });
+}
