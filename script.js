@@ -726,116 +726,126 @@ function openStoryModal(
 
 function hearMyStory() {
 
-    const story =
-        window.currentHistoryStory;
-
+    const story = window.currentHistoryStory;
 
     if (!story) {
-
-        alert(
-            "Story is not available yet."
-        );
-
+        alert("Story is not available yet.");
         return;
     }
 
-
-    if (
-        !("speechSynthesis" in window)
-    ) {
-
-        alert(
-            "Voice narration is not supported in this browser."
-        );
-
+    if (!("speechSynthesis" in window)) {
+        alert("Voice narration is not supported in this browser.");
         return;
     }
 
-
+    // Stop any previous narration
     window.speechSynthesis.cancel();
-
-
-    const narration =
-        new SpeechSynthesisUtterance(
-            story
-        );
-
 
     const language =
         window.currentStoryLanguage || "en";
 
+    const narration =
+        new SpeechSynthesisUtterance(story);
 
-    /* -----------------------------------------
+    /*
+       =========================================
        HINDI
-       ----------------------------------------- */
+       =========================================
+    */
 
     if (language === "hi") {
 
-        narration.lang =
-            "hi-IN";
-
-        narration.rate =
-            0.82;
-
-        narration.pitch =
-            0.9;
+        narration.lang = "hi-IN";
+        narration.rate = 0.80;
+        narration.pitch = 0.95;
+        narration.volume = 1;
 
     }
 
+    /*
+       =========================================
+       HINGLISH
+       =========================================
+    */
 
-    /* -----------------------------------------
-       ENGLISH / HINGLISH
-       ----------------------------------------- */
+    else if (language === "hinglish") {
+
+        narration.lang = "en-IN";
+        narration.rate = 0.82;
+        narration.pitch = 0.95;
+        narration.volume = 1;
+
+    }
+
+    /*
+       =========================================
+       ENGLISH
+       =========================================
+    */
 
     else {
 
-        narration.lang =
-            "en-IN";
-
-        narration.rate =
-            0.82;
-
-        narration.pitch =
-            0.9;
+        narration.lang = "en-IN";
+        narration.rate = 0.82;
+        narration.pitch = 0.95;
+        narration.volume = 1;
     }
 
 
-    narration.volume = 1;
-
+    /*
+       =========================================
+       FIND AVAILABLE VOICE
+       =========================================
+    */
 
     const voices =
         window.speechSynthesis.getVoices();
 
 
-    let matchingVoice = null;
+    let selectedVoice = null;
 
 
     if (language === "hi") {
 
-        matchingVoice =
+        // First preference: Hindi India voice
+        selectedVoice =
             voices.find(
                 voice =>
                     voice.lang &&
                     voice.lang
-                        .toLowerCase()
-                        .startsWith("hi")
+                        .toLowerCase() === "hi-in"
             );
+
+
+        // Second preference: any Hindi voice
+        if (!selectedVoice) {
+
+            selectedVoice =
+                voices.find(
+                    voice =>
+                        voice.lang &&
+                        voice.lang
+                            .toLowerCase()
+                            .startsWith("hi")
+                );
+        }
 
     } else {
 
-        matchingVoice =
+        // Indian English voice
+        selectedVoice =
             voices.find(
                 voice =>
                     voice.lang &&
                     voice.lang
-                        .toLowerCase() ===
-                        "en-in"
+                        .toLowerCase() === "en-in"
             );
 
 
-        if (!matchingVoice) {
+        // Any English voice if Indian English isn't available
+        if (!selectedVoice) {
 
-            matchingVoice =
+            selectedVoice =
                 voices.find(
                     voice =>
                         voice.lang &&
@@ -847,16 +857,54 @@ function hearMyStory() {
     }
 
 
-    if (matchingVoice) {
+    /*
+       =========================================
+       APPLY VOICE
+       =========================================
+    */
+
+    if (selectedVoice) {
 
         narration.voice =
-            matchingVoice;
+            selectedVoice;
+
+        console.log(
+            "Selected voice:",
+            selectedVoice.name,
+            selectedVoice.lang
+        );
+
+    } else {
+
+        console.warn(
+            "Requested voice is not available. Using browser default voice."
+        );
     }
 
+
+    /*
+       =========================================
+       START SPEAKING
+       =========================================
+    */
 
     window.speechSynthesis.speak(
         narration
     );
+}
+if ("speechSynthesis" in window) {
+
+    window.speechSynthesis.onvoiceschanged =
+        function () {
+
+            const voices =
+                window.speechSynthesis.getVoices();
+
+            console.log(
+                "Available voices:",
+                voices
+            );
+        };
 }
 
 
