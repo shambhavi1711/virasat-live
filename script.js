@@ -5,12 +5,9 @@
 
 const modal = document.getElementById("modal");
 const content = document.getElementById("modal-content");
-window.currentStoryLanguage = "en";
 
-function setStoryLanguage(language, number) {
-    window.currentStoryLanguage = language;
-    showStory(number);
-}
+window.currentStoryLanguage = "en";
+window.currentHistoryStory = "";
 
 
 /* =========================================
@@ -28,6 +25,8 @@ function closeModal() {
     if (modal) {
         modal.classList.remove("show");
     }
+
+    stopStory();
 }
 
 if (modal) {
@@ -58,7 +57,8 @@ function scrollToSection(id) {
    PLAYER DATA
    ========================================= */
 
-let xp = Number(localStorage.getItem("virasatXP")) || 0;
+let xp =
+    Number(localStorage.getItem("virasatXP")) || 0;
 
 let completedCheckpoints =
     JSON.parse(
@@ -213,6 +213,86 @@ const checkpoints = {
 
 
 /* =========================================
+   LOCAL MULTILINGUAL STORIES
+   ========================================= */
+
+const localStories = {
+
+    1: {
+        en:
+            "I have watched emperors, soldiers, travellers and families pass through my gates. My architecture was created not only for beauty, but also for protection and purpose.",
+
+        hi:
+            "मैंने सदियों से सम्राटों, सैनिकों, यात्रियों और परिवारों को अपने द्वार से गुजरते देखा है। मेरी वास्तुकला केवल सुंदरता के लिए नहीं, बल्कि सुरक्षा और उद्देश्य को ध्यान में रखकर बनाई गई थी।",
+
+        hinglish:
+            "Maine sadiyon se emperors, soldiers, travellers aur families ko apne gates se guzarte dekha hai. Meri architecture sirf beauty ke liye nahi, balki protection aur purpose ko dhyan mein rakhkar banayi gayi thi."
+    },
+
+
+    2: {
+        en:
+            "I represent the residential architecture within Agra Fort. My spaces combine grandeur, courtyards and detailed architectural elements, showing that the fort was also a place of royal life.",
+
+        hi:
+            "मैं आगरा किले की आवासीय वास्तुकला का प्रतिनिधित्व करता हूँ। मेरे विशाल स्थान, आंगन और सुंदर वास्तु विवरण दिखाते हैं कि यह किला केवल सुरक्षा का स्थान नहीं, बल्कि शाही जीवन का भी केंद्र था।",
+
+        hinglish:
+            "Main Agra Fort ki residential architecture ko represent karta hoon. Mere spaces mein grandeur, courtyards aur detailed architectural elements hain, jo dikhate hain ki fort sirf military place nahi, royal life ka bhi centre tha."
+    },
+
+
+    3: {
+        en:
+            "I was associated with public audiences. My architectural setting created a formal space where the emperor could meet subjects and hear petitions.",
+
+        hi:
+            "मेरा संबंध सार्वजनिक दरबार से था। मेरी वास्तुकला ने ऐसा औपचारिक स्थान बनाया जहाँ सम्राट अपनी प्रजा से मिल सकते थे और उनकी याचिकाएँ सुन सकते थे।",
+
+        hinglish:
+            "Main public audiences se associated tha. Meri architectural setting ek formal space provide karti thi jahan emperor apni subjects se mil sakte the aur unki petitions sun sakte the."
+    },
+
+
+    4: {
+        en:
+            "I represent a more private and formal setting for important royal audiences. My architecture reflects the ceremonial character of the Mughal court.",
+
+        hi:
+            "मैं महत्वपूर्ण शाही बैठकों के लिए अधिक निजी और औपचारिक स्थान का प्रतिनिधित्व करता हूँ। मेरी वास्तुकला मुगल दरबार की औपचारिक और भव्य प्रकृति को दर्शाती है।",
+
+        hinglish:
+            "Main important royal audiences ke liye ek more private aur formal setting ko represent karta hoon. Meri architecture Mughal court ki ceremonial aur grand nature ko reflect karti hai."
+    },
+
+
+    5: {
+        en:
+            "I am one of the memorable structures associated with Agra Fort. My location provides a striking view towards the Yamuna and the Taj Mahal, connecting architecture with the wider historic landscape of Agra.",
+
+        hi:
+            "मैं आगरा किले की यादगार संरचनाओं में से एक हूँ। मेरी स्थिति यमुना और ताजमहल की ओर एक सुंदर दृश्य प्रदान करती है और वास्तुकला को आगरा के व्यापक ऐतिहासिक परिदृश्य से जोड़ती है।",
+
+        hinglish:
+            "Main Agra Fort ki memorable structures mein se ek hoon. Meri location Yamuna aur Taj Mahal ki taraf ek beautiful view deti hai, jo architecture ko Agra ke wider historic landscape se connect karti hai."
+    }
+
+};
+
+
+/* =========================================
+   LANGUAGE
+   ========================================= */
+
+function setStoryLanguage(language, number) {
+
+    window.currentStoryLanguage = language;
+
+    showStory(number);
+}
+
+
+/* =========================================
    XP SYSTEM
    ========================================= */
 
@@ -251,7 +331,8 @@ function completeCheckpoint(number) {
         unlockedCheckpoint < number + 1
     ) {
 
-        unlockedCheckpoint = number + 1;
+        unlockedCheckpoint =
+            number + 1;
 
         localStorage.setItem(
             "unlockedCheckpoint",
@@ -308,15 +389,27 @@ function startCheckpoint(number) {
 
 async function showStory(number = 1) {
 
-    const place = checkpoints[number];
+    const place =
+        checkpoints[number];
 
     if (!place) {
-        console.error("Checkpoint not found:", number);
+
+        console.error(
+            "Checkpoint not found:",
+            number
+        );
+
         return;
     }
 
 
-    /* Show loading screen */
+    const language =
+        window.currentStoryLanguage || "en";
+
+
+    /* -----------------------------------------
+       LOADING SCREEN
+       ----------------------------------------- */
 
     openModal(`
 
@@ -326,20 +419,25 @@ async function showStory(number = 1) {
         </label>
 
         <h2>
-    ${escapeHTML(place.name)}
-</h2>
+            ${escapeHTML(place.name)}
+        </h2>
 
-${number === 1 ? `
-    <img
-        src="amarsingh.jpg"
-        alt="Amar Singh Gate"
-        class="story-image"
-    >
-` : ""}
+        ${
+            number === 1
+                ? `
+                    <img
+                        src="amarsingh.jpg"
+                        alt="Amar Singh Gate"
+                        class="story-image"
+                    >
+                `
+                : ""
+        }
 
-<h3>
-    "${escapeHTML(place.storyTitle)}"
-</h3>
+        <h3>
+            "${escapeHTML(place.storyTitle)}"
+        </h3>
+
         <div class="ai-story-loading">
 
             ✦ History Speaks is preparing
@@ -350,11 +448,14 @@ ${number === 1 ? `
     `);
 
 
-    /* Information sent to secure API */
+    /* -----------------------------------------
+       FACTS FOR GEMINI
+       ----------------------------------------- */
 
     const facts = `
 
-Heritage Site: ${place.name}
+Heritage Site:
+${place.name}
 
 Provided Heritage Information:
 ${place.story}
@@ -370,29 +471,40 @@ ${place.hint}
 
     try {
 
-        const response = await fetch("/api/story", {
+        const response =
+            await fetch(
+                "/api/story",
+                {
+                    method: "POST",
 
-            method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                    body:
+                        JSON.stringify({
 
-            body: JSON.stringify({
-    siteName: place.name,
-    facts: facts,
-    language:
-        window.currentStoryLanguage === "hi"
-            ? "Hindi"
-            : window.currentStoryLanguage === "hinglish"
-                ? "Hinglish"
-                : "English"
-})
+                            siteName:
+                                place.name,
 
-        });
+                            facts:
+                                facts,
+
+                            language:
+                                language === "hi"
+                                    ? "Hindi"
+                                    : language === "hinglish"
+                                        ? "Hinglish"
+                                        : "English"
+
+                        })
+                }
+            );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         if (!response.ok) {
@@ -404,112 +516,31 @@ ${place.hint}
         }
 
 
-        const story = data.story;
+        const story =
+            data.story;
 
 
-        /* Save story for future audio feature */
+        if (!story) {
 
-        window.currentHistoryStory = story;
-
-
-        /* Display AI story */
-
-        openModal(`
-
-            <label>
-                CHECKPOINT
-                ${String(number).padStart(2, "0")} / 05
-            </label>
-
-            <h2>
-                ${escapeHTML(place.name)}
-            </h2>
-
-            <h3>
-                "${escapeHTML(place.storyTitle)}"
-            </h3>
-
-            <div class="ai-story">${escapeHTML(story)}</div>
-
-<div class="story-language">
-    <p><strong>🎧 Choose Story Language</strong></p>
-
-    <button class="modal-button" onclick="setStoryLanguage('en', ${number})">
-        🇬🇧 English
-    </button>
-
-    <button class="modal-button" onclick="setStoryLanguage('hi', ${number})">
-        🇮🇳 हिंदी
-    </button>
-
-    <button class="modal-button" onclick="setStoryLanguage('hinglish', ${number})">
-        💬 Hinglish
-    </button>
-</div>
-
-<div class="story-audio-controls">
-    <button class="modal-button" onclick="hearMyStory()">
-        🔊 Hear My Story
-    </button>
-
-    <button class="modal-button" onclick="stopStory()">
-        ⏹ Stop
-    </button>
-</div>
-            <div class="story-audio-controls">
-
-    <button
-        class="modal-button"
-        onclick="hearMyStory()">
-
-        🔊 Hear My Story
-
-    </button>
-
-    <button
-        class="modal-button"
-        onclick="stopStory()">
-
-        ⏹ Stop
-
-    </button>
-
-</div>
+            throw new Error(
+                "Story was not returned"
+            );
+        }
 
 
-            <div class="story-note">
-
-                <strong>
-                    ✦ HISTORY SPEAKS
-                </strong>
-
-                <p>
-                    This story was created from
-                    the heritage information provided
-                    for this checkpoint.
-                </p>
-
-            </div>
+        window.currentHistoryStory =
+            story;
 
 
-            <p class="verification-note">
+        /* -----------------------------------------
+           AI STORY
+           ----------------------------------------- */
 
-                ✓ Checkpoint-specific story<br>
-                ✓ AI-powered narration<br>
-                ✓ Heritage learning experience
-
-            </p>
-
-
-            <button
-                class="modal-button"
-                onclick="startQuest(${number})">
-
-                Start Quest →
-
-            </button>
-
-        `);
+        openStoryModal(
+            number,
+            place,
+            story
+        );
 
 
     } catch (error) {
@@ -518,134 +549,329 @@ ${place.hint}
             "History Speaks error:",
             error
         );
-window.currentHistoryStory = place.story;
 
-        /* Fallback to original story */
 
-        openModal(`
+        /* -----------------------------------------
+           LOCAL FALLBACK
+           ----------------------------------------- */
 
-            <label>
-                CHECKPOINT
-                ${String(number).padStart(2, "0")} / 05
-            </label>
+        const fallback =
+            localStories[number][language]
+            || localStories[number].en;
 
-            <h2>
-    ${escapeHTML(place.name)}
-</h2>
 
-${number === 1 ? `
-    <img
-        src="amarsingh.jpg"
-        alt="Amar Singh Gate"
-        class="story-image"
-    >
-` : ""}
+        window.currentHistoryStory =
+            fallback;
 
-<h3>
-    "${escapeHTML(place.storyTitle)}"
-</h3>
+
+        openStoryModal(
+            number,
+            place,
+            fallback,
+            true
+        );
+    }
+}
+
+
+/* =========================================
+   STORY MODAL
+   ========================================= */
+
+function openStoryModal(
+    number,
+    place,
+    story,
+    fallback = false
+) {
+
+    openModal(`
+
+        <label>
+            CHECKPOINT
+            ${String(number).padStart(2, "0")} / 05
+        </label>
+
+        <h2>
+            ${escapeHTML(place.name)}
+        </h2>
+
+        ${
+            number === 1
+                ? `
+                    <img
+                        src="amarsingh.jpg"
+                        alt="Amar Singh Gate"
+                        class="story-image"
+                    >
+                `
+                : ""
+        }
+
+        <h3>
+            "${escapeHTML(place.storyTitle)}"
+        </h3>
+
+
+        <div class="ai-story">
+            ${escapeHTML(story)}
+        </div>
+
+
+        <div class="story-language">
 
             <p>
-                ${escapeHTML(place.story)}
-            </p>
-<div class="story-audio-controls">
-
-    <button
-        class="modal-button"
-        onclick="hearMyStory()">
-
-        🔊 Hear My Story
-
-    </button>
-
-    <button
-        class="modal-button"
-        onclick="stopStory()">
-
-        ⏹ Stop
-
-    </button>
-
-</div>
-
-            <div class="story-note">
-
                 <strong>
-                    🎧 Story Mode
+                    🎧 Choose Story Language
                 </strong>
-
-                <p>
-                    AI storytelling is temporarily
-                    unavailable. You can still explore
-                    the heritage story.
-                </p>
-
-            </div>
-
-
-            <p class="verification-note">
-
-                ✓ Checkpoint information<br>
-                ✓ Heritage learning experience<br>
-                ✓ Interactive exploration
-
             </p>
 
 
             <button
                 class="modal-button"
-                onclick="startQuest(${number})">
+                onclick="setStoryLanguage('en', ${number})">
 
-                Start Quest →
+                🇬🇧 English
 
             </button>
 
-        `);
-    }
+
+            <button
+                class="modal-button"
+                onclick="setStoryLanguage('hi', ${number})">
+
+                🇮🇳 हिंदी
+
+            </button>
+
+
+            <button
+                class="modal-button"
+                onclick="setStoryLanguage('hinglish', ${number})">
+
+                💬 Hinglish
+
+            </button>
+
+        </div>
+
+
+        <!-- ONLY ONE AUDIO CONTROL BLOCK -->
+
+        <div class="story-audio-controls">
+
+            <button
+                class="modal-button"
+                onclick="hearMyStory()">
+
+                🔊 Hear My Story
+
+            </button>
+
+
+            <button
+                class="modal-button"
+                onclick="stopStory()">
+
+                ⏹ Stop
+
+            </button>
+
+        </div>
+
+
+        <div class="story-note">
+
+            <strong>
+                ✦ HISTORY SPEAKS
+            </strong>
+
+            <p>
+
+                ${
+                    fallback
+                        ? "AI storytelling is temporarily unavailable. Showing the verified local story for this checkpoint."
+                        : "This story was created from the heritage information provided for this checkpoint."
+                }
+
+            </p>
+
+        </div>
+
+
+        <p class="verification-note">
+
+            ✓ Checkpoint-specific story<br>
+            ✓ AI-powered narration<br>
+            ✓ Heritage learning experience
+
+        </p>
+
+
+        <button
+            class="modal-button"
+            onclick="startQuest(${number})">
+
+            Start Quest →
+
+        </button>
+
+    `);
 }
+
+
 /* =========================================
    HEAR MY STORY - TEXT TO SPEECH
    ========================================= */
 
 function hearMyStory() {
 
-    const story = window.currentHistoryStory;
+    const story =
+        window.currentHistoryStory;
+
 
     if (!story) {
-        alert("Story is not available yet.");
+
+        alert(
+            "Story is not available yet."
+        );
+
         return;
     }
 
-    if (!("speechSynthesis" in window)) {
-        alert("Voice narration is not supported in this browser.");
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        alert(
+            "Voice narration is not supported in this browser."
+        );
+
         return;
     }
 
-    // Stop any previous narration
-    speechSynthesis.cancel();
 
-    const narration = new SpeechSynthesisUtterance(story);
+    window.speechSynthesis.cancel();
 
-    // Indian English voice
-    narration.lang = "en-IN";
 
-    // Storytelling style
-    narration.rate = 0.82;
-    narration.pitch = 0.9;
+    const narration =
+        new SpeechSynthesisUtterance(
+            story
+        );
+
+
+    const language =
+        window.currentStoryLanguage || "en";
+
+
+    /* -----------------------------------------
+       HINDI
+       ----------------------------------------- */
+
+    if (language === "hi") {
+
+        narration.lang =
+            "hi-IN";
+
+        narration.rate =
+            0.82;
+
+        narration.pitch =
+            0.9;
+
+    }
+
+
+    /* -----------------------------------------
+       ENGLISH / HINGLISH
+       ----------------------------------------- */
+
+    else {
+
+        narration.lang =
+            "en-IN";
+
+        narration.rate =
+            0.82;
+
+        narration.pitch =
+            0.9;
+    }
+
+
     narration.volume = 1;
 
-    // Try to find an Indian English voice
-    const voices = speechSynthesis.getVoices();
 
-    const indianVoice = voices.find(voice =>
-        voice.lang === "en-IN"
-    );
+    const voices =
+        window.speechSynthesis.getVoices();
 
-    if (indianVoice) {
-        narration.voice = indianVoice;
+
+    let matchingVoice = null;
+
+
+    if (language === "hi") {
+
+        matchingVoice =
+            voices.find(
+                voice =>
+                    voice.lang &&
+                    voice.lang
+                        .toLowerCase()
+                        .startsWith("hi")
+            );
+
+    } else {
+
+        matchingVoice =
+            voices.find(
+                voice =>
+                    voice.lang &&
+                    voice.lang
+                        .toLowerCase() ===
+                        "en-in"
+            );
+
+
+        if (!matchingVoice) {
+
+            matchingVoice =
+                voices.find(
+                    voice =>
+                        voice.lang &&
+                        voice.lang
+                            .toLowerCase()
+                            .startsWith("en")
+                );
+        }
     }
 
-    speechSynthesis.speak(narration);
+
+    if (matchingVoice) {
+
+        narration.voice =
+            matchingVoice;
+    }
+
+
+    window.speechSynthesis.speak(
+        narration
+    );
+}
+
+
+/* =========================================
+   STOP STORY
+   ========================================= */
+
+function stopStory() {
+
+    if (
+        "speechSynthesis" in window
+    ) {
+
+        window.speechSynthesis.cancel();
+    }
 }
 
 
@@ -661,8 +887,7 @@ function showQR(number = 1) {
 
 
     const checkpointURL =
-        window.location.origin +
-        window.location.pathname +
+        "https://virasat-2.vercel.app/" +
         "?checkpoint=" +
         checkpointID;
 
@@ -677,9 +902,11 @@ function showQR(number = 1) {
             HERITAGE CHECKPOINT
         </label>
 
+
         <h2>
             Scan → Experience
         </h2>
+
 
         <p>
 
@@ -688,7 +915,8 @@ function showQR(number = 1) {
                 ${String(number).padStart(2, "0")}
             </b>
 
-            — ${escapeHTML(place.name)}
+            —
+            ${escapeHTML(place.name)}
 
         </p>
 
@@ -705,7 +933,9 @@ function showQR(number = 1) {
 
 
         <p class="qr-url">
+
             ${escapeHTML(checkpointURL)}
+
         </p>
 
 
@@ -728,7 +958,9 @@ function showQR(number = 1) {
 function openCheckpoint(number) {
 
     const url =
-        new URL(window.location.href);
+        new URL(
+            window.location.href
+        );
 
 
     url.searchParams.set(
@@ -748,11 +980,14 @@ function openCheckpoint(number) {
     closeModal();
 
 
-    setTimeout(function () {
+    setTimeout(
+        function () {
 
-        startCheckpoint(number);
+            startCheckpoint(number);
 
-    }, 300);
+        },
+        300
+    );
 }
 
 
@@ -811,7 +1046,11 @@ function startQuest(number) {
         <p>
 
             <b>
-                ${escapeHTML(place.question)}
+
+                ${escapeHTML(
+                    place.question
+                )}
+
             </b>
 
         </p>
@@ -835,7 +1074,10 @@ function startQuest(number) {
    QUEST ANSWER
    ========================================= */
 
-function answerQuest(number, selected) {
+function answerQuest(
+    number,
+    selected
+) {
 
     const place =
         checkpoints[number];
@@ -844,7 +1086,9 @@ function answerQuest(number, selected) {
     if (!place) return;
 
 
-    if (selected === place.answer) {
+    if (
+        selected === place.answer
+    ) {
 
         const alreadyCompleted =
             isCompleted(number);
@@ -860,6 +1104,7 @@ function answerQuest(number, selected) {
                 <label>
                     QUEST COMPLETED
                 </label>
+
 
                 <h2>
                     ✓ Correct!
@@ -904,6 +1149,7 @@ function answerQuest(number, selected) {
                 <label>
                     QUEST COMPLETE 🎉
                 </label>
+
 
                 <h2>
                     +50 Virasat XP
@@ -969,7 +1215,11 @@ function answerQuest(number, selected) {
 
 
             <p>
-                ${escapeHTML(place.hint)}
+
+                ${escapeHTML(
+                    place.hint
+                )}
+
             </p>
 
 
@@ -1109,8 +1359,6 @@ function AIDemo() {
 }
 
 
-/* Allow HTML to call showAIDemo() */
-
 function showAIDemo() {
 
     AIDemo();
@@ -1162,7 +1410,9 @@ function askAI(question) {
         response =
             "Agra Fort is a major historic fort complex in Agra. Virasat Live connects questions to the checkpoint a visitor is exploring so the answer can focus on what they are actually seeing.";
 
-    } else if (
+    }
+
+    else if (
         q.includes("gate") ||
         q.includes("gateway") ||
         q.includes("entrance")
@@ -1171,7 +1421,9 @@ function askAI(question) {
         response =
             "A gateway is more than an entrance. Its design can influence movement, access and defence. Virasat Live turns architectural observations into interactive learning challenges.";
 
-    } else if (
+    }
+
+    else if (
         q.includes("hindi") ||
         q.includes("हिंदी")
     ) {
@@ -1199,8 +1451,13 @@ function askAI(question) {
                 You asked:
             </strong>
 
+
             <p>
-                ${escapeHTML(question)}
+
+                ${escapeHTML(
+                    question
+                )}
+
             </p>
 
 
@@ -1211,8 +1468,11 @@ function askAI(question) {
                 🏛️ Virasat AI:
             </strong>
 
+
             <p>
+
                 ${response}
+
             </p>
 
         </div>
@@ -1246,7 +1506,9 @@ function askAI(question) {
 function escapeHTML(text) {
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     div.textContent = text;
@@ -1276,8 +1538,9 @@ function community() {
 
         <p>
 
-            Know an old stepwell, local legend,
-            craft, folk tradition or forgotten place?
+            Know an old stepwell,
+            local legend, craft,
+            folk tradition or forgotten place?
 
         </p>
 
@@ -1360,18 +1623,29 @@ function showProgress() {
     let checkpointList = "";
 
 
-    for (let i = 1; i <= 5; i++) {
+    for (
+        let i = 1;
+        i <= 5;
+        i++
+    ) {
 
-        let status = "🔒 Locked";
+        let status =
+            "🔒 Locked";
 
 
         if (isCompleted(i)) {
 
-            status = "✅ Completed";
+            status =
+                "✅ Completed";
 
-        } else if (i <= unlockedCheckpoint) {
+        }
 
-            status = "🔓 Unlocked";
+        else if (
+            i <= unlockedCheckpoint
+        ) {
+
+            status =
+                "🔓 Unlocked";
         }
 
 
@@ -1405,6 +1679,7 @@ function showProgress() {
             <span>
                 VIRASAT XP
             </span>
+
 
             <strong>
                 ${xp}
@@ -1447,7 +1722,9 @@ function showProgress() {
 
 function resetDemo() {
 
-    localStorage.removeItem("virasatXP");
+    localStorage.removeItem(
+        "virasatXP"
+    );
 
     localStorage.removeItem(
         "completedCheckpoints"
@@ -1535,11 +1812,160 @@ function detectCheckpoint() {
         Number(match[1]);
 
 
-    setTimeout(function () {
+    setTimeout(
+        function () {
 
-        startCheckpoint(number);
+            startCheckpoint(number);
 
-    }, 700);
+        },
+        700
+    );
+}
+
+
+/* =========================================
+   NAVBAR LANGUAGE
+   ========================================= */
+
+function changeLanguage(language) {
+
+    window.currentStoryLanguage =
+        language;
+
+
+    const translations = {
+
+        en: {
+            home: "Home",
+            explore: "Explore",
+            how: "How It Works",
+            ai: "AI Guide",
+            community: "Community"
+        },
+
+
+        hi: {
+            home: "होम",
+            explore: "खोजें",
+            how: "यह कैसे काम करता है",
+            ai: "AI गाइड",
+            community: "समुदाय"
+        },
+
+
+        hinglish: {
+            home: "Home",
+            explore: "Explore Karo",
+            how: "Kaise Kaam Karta Hai",
+            ai: "AI Guide",
+            community: "Community"
+        }
+
+    };
+
+
+    const selectedLanguage =
+        translations[language];
+
+
+    /* If data-i18n exists */
+
+    document
+        .querySelectorAll(
+            "[data-i18n]"
+        )
+        .forEach(
+            element => {
+
+                const key =
+                    element.getAttribute(
+                        "data-i18n"
+                    );
+
+
+                if (
+                    selectedLanguage[key]
+                ) {
+
+                    element.textContent =
+                        selectedLanguage[key];
+                }
+
+            }
+        );
+
+
+    /* Also update navbar links
+       even if data-i18n is missing */
+
+    const links =
+        document.querySelectorAll(
+            "nav a"
+        );
+
+
+    links.forEach(
+        link => {
+
+            const text =
+                link.textContent
+                    .trim()
+                    .toLowerCase();
+
+
+            if (
+                text === "home" ||
+                text === "होम"
+            ) {
+
+                link.textContent =
+                    selectedLanguage.home;
+            }
+
+
+            else if (
+                text === "explore" ||
+                text === "खोजें" ||
+                text.includes("explore karo")
+            ) {
+
+                link.textContent =
+                    selectedLanguage.explore;
+            }
+
+
+            else if (
+                text.includes("how it works") ||
+                text.includes("यह कैसे") ||
+                text.includes("kaise kaam")
+            ) {
+
+                link.textContent =
+                    selectedLanguage.how;
+            }
+
+
+            else if (
+                text.includes("ai guide") ||
+                text.includes("ai गाइड")
+            ) {
+
+                link.textContent =
+                    selectedLanguage.ai;
+            }
+
+
+            else if (
+                text === "community" ||
+                text === "समुदाय"
+            ) {
+
+                link.textContent =
+                    selectedLanguage.community;
+            }
+
+        }
+    );
 }
 
 
@@ -1555,41 +1981,3 @@ document.addEventListener(
 
     }
 );
-function changeLanguage(language) {
-
-    const translations = {
-        en: {
-            home: "Home",
-            explore: "Explore",
-            how: "How It Works",
-            ai: "AI Guide",
-            community: "Community"
-        },
-
-        hi: {
-            home: "होम",
-            explore: "खोजें",
-            how: "यह कैसे काम करता है",
-            ai: "AI गाइड",
-            community: "समुदाय"
-        },
-
-        hinglish: {
-            home: "Home",
-            explore: "Explore Karo",
-            how: "Kaise Kaam Karta Hai",
-            ai: "AI Guide",
-            community: "Community"
-        }
-    };
-
-    const selectedLanguage = translations[language];
-
-    document.querySelectorAll("[data-i18n]").forEach(element => {
-        const key = element.getAttribute("data-i18n");
-
-        if (selectedLanguage[key]) {
-            element.textContent = selectedLanguage[key];
-        }
-    });
-}
