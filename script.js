@@ -5,6 +5,12 @@
 
 const modal = document.getElementById("modal");
 const content = document.getElementById("modal-content");
+window.currentStoryLanguage = "en";
+
+function setStoryLanguage(language, number) {
+    window.currentStoryLanguage = language;
+    showStory(number);
+}
 
 
 /* =========================================
@@ -373,14 +379,15 @@ ${place.hint}
             },
 
             body: JSON.stringify({
-
-                siteName: place.name,
-
-                facts: facts,
-
-                language: "English"
-
-            })
+    siteName: place.name,
+    facts: facts,
+    language:
+        window.currentStoryLanguage === "hi"
+            ? "Hindi"
+            : window.currentStoryLanguage === "hinglish"
+                ? "Hinglish"
+                : "English"
+})
 
         });
 
@@ -422,9 +429,52 @@ ${place.hint}
                 "${escapeHTML(place.storyTitle)}"
             </h3>
 
-            <div class="ai-story">
-                ${escapeHTML(story)}
-            </div>
+            <div class="ai-story">${escapeHTML(story)}</div>
+
+<div class="story-language">
+    <p><strong>🎧 Choose Story Language</strong></p>
+
+    <button class="modal-button" onclick="setStoryLanguage('en', ${number})">
+        🇬🇧 English
+    </button>
+
+    <button class="modal-button" onclick="setStoryLanguage('hi', ${number})">
+        🇮🇳 हिंदी
+    </button>
+
+    <button class="modal-button" onclick="setStoryLanguage('hinglish', ${number})">
+        💬 Hinglish
+    </button>
+</div>
+
+<div class="story-audio-controls">
+    <button class="modal-button" onclick="hearMyStory()">
+        🔊 Hear My Story
+    </button>
+
+    <button class="modal-button" onclick="stopStory()">
+        ⏹ Stop
+    </button>
+</div>
+            <div class="story-audio-controls">
+
+    <button
+        class="modal-button"
+        onclick="hearMyStory()">
+
+        🔊 Hear My Story
+
+    </button>
+
+    <button
+        class="modal-button"
+        onclick="stopStory()">
+
+        ⏹ Stop
+
+    </button>
+
+</div>
 
 
             <div class="story-note">
@@ -468,7 +518,7 @@ ${place.hint}
             "History Speaks error:",
             error
         );
-
+window.currentHistoryStory = place.story;
 
         /* Fallback to original story */
 
@@ -498,7 +548,25 @@ ${number === 1 ? `
             <p>
                 ${escapeHTML(place.story)}
             </p>
+<div class="story-audio-controls">
 
+    <button
+        class="modal-button"
+        onclick="hearMyStory()">
+
+        🔊 Hear My Story
+
+    </button>
+
+    <button
+        class="modal-button"
+        onclick="stopStory()">
+
+        ⏹ Stop
+
+    </button>
+
+</div>
 
             <div class="story-note">
 
@@ -534,6 +602,50 @@ ${number === 1 ? `
 
         `);
     }
+}
+/* =========================================
+   HEAR MY STORY - TEXT TO SPEECH
+   ========================================= */
+
+function hearMyStory() {
+
+    const story = window.currentHistoryStory;
+
+    if (!story) {
+        alert("Story is not available yet.");
+        return;
+    }
+
+    if (!("speechSynthesis" in window)) {
+        alert("Voice narration is not supported in this browser.");
+        return;
+    }
+
+    // Stop any previous narration
+    speechSynthesis.cancel();
+
+    const narration = new SpeechSynthesisUtterance(story);
+
+    // Indian English voice
+    narration.lang = "en-IN";
+
+    // Storytelling style
+    narration.rate = 0.82;
+    narration.pitch = 0.9;
+    narration.volume = 1;
+
+    // Try to find an Indian English voice
+    const voices = speechSynthesis.getVoices();
+
+    const indianVoice = voices.find(voice =>
+        voice.lang === "en-IN"
+    );
+
+    if (indianVoice) {
+        narration.voice = indianVoice;
+    }
+
+    speechSynthesis.speak(narration);
 }
 
 
